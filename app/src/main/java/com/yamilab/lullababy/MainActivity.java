@@ -2,6 +2,7 @@ package com.yamilab.lullababy;
 
 
 import android.animation.ObjectAnimator;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
@@ -26,13 +27,15 @@ public class MainActivity extends AppCompatActivity {
 
     private ObjectAnimator animation;
 
-    private int melodyIndex=1;
+    private int melodyIndex, defValue=0;
 
-    private int timer=300000;
+    private int timer;
 
     private SeekBar timerControl= null;
 
     CountDownTimer cTimer=null;
+
+    SharedPreferences sPref;
 
 
     @Override
@@ -40,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+
+        sPref = getPreferences(MODE_PRIVATE);
+        melodyIndex = sPref.getInt("melody",0);
+        timer = sPref.getInt("timer",300000);
 
         //реклама
         // Load an ad into the AdMob banner view.
@@ -57,9 +65,13 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getStringArray(R.array.melody_array);
 
         textMelody.setText(data_melody[melodyIndex]);
+
         textTimer.setText(timer/60000+ " мин.");
 
+
+
         timerControl = (SeekBar) findViewById(R.id.timer_bar);
+        timerControl.setProgress(timer/60000);
 
         timerControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -102,6 +114,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 cancelTimer();
                 animation.setDuration (timer); //in milliseconds
+
+                sPref = getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor ed = sPref.edit();
+                ed.putInt("melody",melodyIndex );
+                ed.putInt("timer",timer );
+                ed.commit();
+
                 startTimer(timer);
                 animation.start();
             }
