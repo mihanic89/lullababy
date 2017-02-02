@@ -1,0 +1,97 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context="com.yamilab.lullababy.MainActivity">
+
+
+    <LinearLayout
+        android:id="@+id/link_Layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_above="@+id/adView">
+
+
+
+
+
+         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/textView1"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:text="@string/melody"/>
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:spinnerMode="dialog"
+            android:id="@+id/spinner_melody">
+        </Spinner>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/textView2"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:text="@string/time"/>
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:spinnerMode="dialog"
+            android:id="@+id/spinner_time">
+        </Spinner>
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="51dp"
+        android:layout_below="@+id/dialog_Layout"
+        >
+
+        <ImageButton
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            ads:srcCompat="@android:drawable/ic_media_play"
+            android:id="@+id/btnStart"
+           android:layout_gravity="center"
+
+            />
+
+        <ImageButton
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_toRightOf="@+id/btnStart"
+            ads:srcCompat="@android:drawable/ic_media_pause"
+            android:id="@+id/btnStop"
+
+
+            />
+
+    </LinearLayout>
+    </LinearLayout>
+    <!-- view for AdMob Banner Ad -->
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id" />
+</RelativeLayout>

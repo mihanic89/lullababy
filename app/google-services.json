@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "934182041750",
+    "firebase_url": "https://lullababy-2e3b9.firebaseio.com",
+    "project_id": "lullababy-2e3b9",
+    "storage_bucket": "lullababy-2e3b9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934182041750:android:225838ae7c26fd46",
+        "android_client_info": {
+          "package_name": "com.yamilab.lullababy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "934182041750-gejlvdd5e5gevhfle22fhfob361t2dt8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yamilab.lullababy",
+            "certificate_hash": "4BF335741AB28CECFBC6B334CDDFFEB0C2FBFEB7"
+          }
+        },
+        {
+          "client_id": "934182041750-4psd7knfkh672atop2u3o31cdnvghdka.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBiDKxlMRPzcGF1lM6LE7oAqaXRlqTV-4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "934182041750-4psd7knfkh672atop2u3o31cdnvghdka.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
