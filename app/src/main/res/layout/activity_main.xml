@@ -7,84 +7,6 @@
     tools:context="com.yamilab.lullababy.MainActivity">
 
 
-    <LinearLayout
-        android:id="@+id/link_Layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_above="@+id/adView">
-
-
-
-
-
-         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/textView1"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:text="@string/melody"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:spinnerMode="dialog"
-            android:id="@+id/spinner_melody">
-        </Spinner>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/textView2"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:text="@string/time"/>
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:spinnerMode="dialog"
-            android:id="@+id/spinner_time">
-        </Spinner>
-
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="51dp"
-        android:layout_below="@+id/dialog_Layout"
-        >
-
-        <ImageButton
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            ads:srcCompat="@android:drawable/ic_media_play"
-            android:id="@+id/btnStart"
-           android:layout_gravity="center"
-
-            />
-
-        <ImageButton
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_toRightOf="@+id/btnStart"
-            ads:srcCompat="@android:drawable/ic_media_pause"
-            android:id="@+id/btnStop"
-
-
-            />
-
-    </LinearLayout>
-    </LinearLayout>
     <!-- view for AdMob Banner Ad -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
@@ -94,4 +16,116 @@
         android:layout_centerHorizontal="true"
         ads:adSize="SMART_BANNER"
         ads:adUnitId="@string/banner_ad_unit_id" />
+
+    <LinearLayout
+        android:id="@+id/link_Layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <SeekBar
+            android:id="@+id/timer_bar"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:max="180"
+
+            android:progress="0"
+            android:progressDrawable="@drawable/progressbar"
+            android:secondaryProgress="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/textViewTimer"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:padding="@dimen/activity_vertical_margin"
+            android:text="@string/time"/>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/textViewMelody"
+            android:textColor="@android:color/white"
+            android:textSize="40sp"
+            android:padding="@dimen/activity_vertical_margin"
+            />
+
+
+        <RelativeLayout
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/dialog_Layout"
+        >
+
+
+            <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_centerHorizontal="true"
+            android:max="500"
+            android:progress="0"
+            android:progressDrawable="@drawable/circular"
+            android:layout_alignStart="@+id/btnStart"/>
+
+
+
+
+
+
+            <ImageButton
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                ads:srcCompat="@android:drawable/ic_media_previous"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circularbutton"
+                android:id="@+id/btnPrevious"
+             />
+
+            <ImageButton
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+
+                ads:srcCompat="@android:drawable/ic_media_play"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circularbutton"
+                android:id="@+id/btnStart"
+                android:layout_toEndOf="@+id/btnPrevious"
+                />
+
+            <ImageButton
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                ads:srcCompat="@android:drawable/ic_media_pause"
+                android:background="@drawable/circularbutton"
+                android:scaleType="centerCrop"
+                android:id="@+id/btnStop"
+                android:layout_toEndOf="@+id/btnStart" />
+
+            <ImageButton
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                ads:srcCompat="@android:drawable/ic_media_next"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circularbutton"
+                android:id="@+id/btnNext"
+                android:layout_toEndOf="@+id/btnStop" />
+
+
+        </RelativeLayout>
+    </LinearLayout>
 </RelativeLayout>

@@ -1,72 +1,170 @@
 package com.yamilab.lullababy;
 
+
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
+import android.view.Window;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     String[] data_time;
     String[] data_melody;
-    private Button btnStart,btnStop;
+    private ImageButton btnStart,btnStop,btnPrevious,btnNext;
+
+    private TextView textMelody;
+    private TextView textTimer;
+
+    private ProgressBar progressBar;
+
+    private ObjectAnimator animation;
+
+    private int melodyIndex=1;
+
+    private int timer=300000;
+
+    private SeekBar timerControl= null;
+
+    CountDownTimer cTimer=null;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+        //реклама
         // Load an ad into the AdMob banner view.
-        AdView adView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("09D7B5315C60A80D280B8CDF618FD3DE")
-                .build();
-        adView.loadAd(adRequest);
+        //AdView adView = (AdView) findViewById(adView);
+        //AdRequest adRequest = new AdRequest.Builder()
+        //        .addTestDevice("09D7B5315C60A80D280B8CDF618FD3DE")
+        //        .build();
+        //adView.loadAd(adRequest);
 
-        data_time =
-                getResources().getStringArray(R.array.time_array);
+        textMelody=(TextView) findViewById(R.id.textViewMelody);
+        textTimer=(TextView) findViewById(R.id.textViewTimer);
+
+
         data_melody=
                 getResources().getStringArray(R.array.melody_array);
 
+        textMelody.setText(data_melody[melodyIndex]);
+        textTimer.setText(timer/60000+ " мин.");
 
-        ArrayAdapter<String> adapterMelody =
-                new ArrayAdapter<String>(this, R.layout.simple_spinner_item,data_melody);
+        timerControl = (SeekBar) findViewById(R.id.timer_bar);
 
-        adapterMelody.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+        timerControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (progress<5)
+                {progress=5;
+                    textTimer.setText(progress+ " мин.");}
+                else textTimer.setText(progress+ " мин.");
+                if (progress>175) {progress=600;
+                    textTimer.setText("∞ мин.");}
+                else textTimer.setText(progress+ " мин.");
 
 
-        ArrayAdapter<String> adapterTime =
-                new ArrayAdapter<String>(this, R.layout.simple_spinner_item,data_time);
+                timer=progress*60000;
 
-        adapterTime.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
-        Spinner spinnerMelody = (Spinner) findViewById(R.id.spinner_melody);
-        spinnerMelody.setAdapter(adapterMelody);
+        //анимация
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        animation = ObjectAnimator.ofInt (progressBar, "progress", 500, 0); //
+        //animation.setDuration (30000); //in milliseconds
+        animation.setInterpolator (new LinearInterpolator());
+        //animation.start();
 
-        Spinner spinnerTime = (Spinner) findViewById(R.id.spinner_time);
-        spinnerTime.setAdapter(adapterTime);
+       btnStart=(ImageButton) findViewById(R.id.btnStart);
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelTimer();
+                animation.setDuration (timer); //in milliseconds
+                startTimer(timer);
+                animation.start();
+            }
+        });
 
-        spinnerMelody.setPrompt(getResources().getString(R.string.melody));
-        spinnerTime.setPrompt(getResources().getString(R.string.time));
+        btnStop=(ImageButton) findViewById(R.id.btnStop);
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelTimer();
+                animation.cancel();
+                progressBar.clearAnimation();
+            }
+        });
 
-        btnStart = (Button) findViewById(R.id.btnStart);
-        btnStop = (Button) findViewById(R.id.btnStop);
+        btnPrevious=(ImageButton) findViewById(R.id.btnPrevious);
+        btnPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                melodyIndex--;
+                if (melodyIndex<0) melodyIndex=11;
+                textMelody.setText(data_melody[melodyIndex]);
+            }
+        });
+
+        btnNext=(ImageButton) findViewById(R.id.btnNext);
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                melodyIndex++;
+                if (melodyIndex>11) melodyIndex=0;
+                textMelody.setText(data_melody[melodyIndex]);
+            }
+        });
 
 
     }
 
-    public void onClick(View v) {
+    void startTimer(int time) {
 
+        cTimer = new CountDownTimer(time,1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+               //textTimer.setText("seconds remaining: " + millisUntilFinished / 1000);
+               // Toast.makeText(MainActivity.this,"seconds remaining: " + millisUntilFinished / 1000,
+                //        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFinish() {
+              //  mTextField.setText("done!");
+            }
+
+        };
+        cTimer.start();
+        animation.start ();
     }
 
+    void cancelTimer(){
+        if (cTimer!=null)
+            cTimer.cancel();
+
+
+    }
 }
