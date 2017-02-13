@@ -135,26 +135,11 @@ public class MainActivity extends AppCompatActivity {
         //animation.start();
 
         btnStart = (ImageButton) findViewById(R.id.btnStart);
-        if (isMyServiceRunning(MediaPlayerService.class))
-            btnStart.setImageResource(android.R.drawable.ic_media_pause);
-            else
-            btnStart.setImageResource(android.R.drawable.ic_media_play);
+       
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isMyServiceRunning(MediaPlayerService.class)){
-                    btnStart.setImageResource(android.R.drawable.ic_media_play);
-                    player.stopPlayer();
-                    cancelTimer();
-                    animation.cancel();
-                    progressBar.clearAnimation();
-                    progressBar.setVisibility(View.INVISIBLE);
-                }
-
-                    else{
-                    start_lullababy();
-                    btnStart.setImageResource(android.R.drawable.ic_media_pause);
-                }
+                start_lullababy();
                 /*
                 cancelTimer();
                 animation.setDuration(timer); //in milliseconds
@@ -170,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 */
             }
         });
-        /*
+
         btnStop = (ImageButton) findViewById(R.id.btnStop);
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,10 +164,10 @@ public class MainActivity extends AppCompatActivity {
                 cancelTimer();
                 animation.cancel();
                 progressBar.clearAnimation();
-
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
-        */
+
         btnPrevious = (ImageButton) findViewById(R.id.btnPrevious);
         btnPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
