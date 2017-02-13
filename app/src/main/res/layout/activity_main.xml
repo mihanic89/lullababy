@@ -93,22 +93,15 @@
                 android:layout_toEndOf="@+id/btnPrevious"
                 android:background="@drawable/circularbutton"
                 android:scaleType="centerCrop"
-                ads:srcCompat="@android:drawable/ic_media_play" />
+                 />
 
-            <ImageButton
-                android:id="@+id/btnStop"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_toEndOf="@+id/btnStart"
-                android:background="@drawable/circularbutton"
-                android:scaleType="centerCrop"
-                ads:srcCompat="@android:drawable/ic_media_pause" />
+
 
             <ImageButton
                 android:id="@+id/btnNext"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:layout_toEndOf="@+id/btnStop"
+                android:layout_toEndOf="@+id/btnStart"
                 android:background="@drawable/circularbutton"
                 android:scaleType="centerCrop"
                 ads:srcCompat="@android:drawable/ic_media_next" />

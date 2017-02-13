@@ -24,6 +24,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -330,6 +331,23 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         // afd = context.getResources().openRawResourceFd(activeAudio.getData());
 
 
+        AssetFileDescriptor afd = getApplicationContext().getResources().openRawResourceFd(activeAudio.getData());
+        if (afd == null) return;
+        try {
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            afd.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+       mediaPlayer.prepareAsync();
+
+
+        /*
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer = MediaPlayer.create(this, activeAudio.getData());
         mediaPlayer.setLooping(true);
@@ -337,7 +355,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             mediaPlayer.start();
             player_start=false;
         }
-        /*
+
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             // Set the data source to the mediaFile location

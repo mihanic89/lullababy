@@ -2,12 +2,14 @@ package com.yamilab.lullababy;
 
 
 import android.animation.ObjectAnimator;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -133,10 +135,25 @@ public class MainActivity extends AppCompatActivity {
         //animation.start();
 
         btnStart = (ImageButton) findViewById(R.id.btnStart);
+        if (isMyServiceRunning(MediaPlayerService.class))
+            btnStart.setImageResource(android.R.drawable.ic_media_pause);
+            else
+            btnStart.setImageResource(android.R.drawable.ic_media_play);
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start_lullababy();
+                if (isMyServiceRunning(MediaPlayerService.class)){
+                    btnStart.setImageResource(android.R.drawable.ic_media_play);
+                    player.stopPlayer();
+                    cancelTimer();
+                    animation.cancel();
+                    progressBar.clearAnimation();
+                }
+
+                    else{
+                    start_lullababy();
+                    btnStart.setImageResource(android.R.drawable.ic_media_pause);
+                }
                 /*
                 cancelTimer();
                 animation.setDuration(timer); //in milliseconds
@@ -152,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 */
             }
         });
-
+        /*
         btnStop = (ImageButton) findViewById(R.id.btnStop);
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        */
         btnPrevious = (ImageButton) findViewById(R.id.btnPrevious);
         btnPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 melodyIndex--;
                 if (melodyIndex < 0) melodyIndex = 11;
                 textMelody.setText(data_melody[melodyIndex]);
-                start_lullababy();
+               // if( AudioManager.isMusicActive())start_lullababy();
             }
         });
 
@@ -183,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                 melodyIndex++;
                 if (melodyIndex > 11) melodyIndex = 0;
                 textMelody.setText(data_melody[melodyIndex]);
-                start_lullababy();
+              //  if(isMyServiceRunning(MediaPlayerService.class)==true)start_lullababy();
 
             }
         });
@@ -314,5 +331,15 @@ public class MainActivity extends AppCompatActivity {
             Intent broadcastIntent = new Intent(Broadcast_PLAY_NEW_AUDIO);
             sendBroadcast(broadcastIntent);
         }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
