@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
+        loadAudio();
         //реклама
         // Load an ad into the AdMob banner view.
 
@@ -134,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                start_lullababy();
+                /*
                 cancelTimer();
                 animation.setDuration(timer); //in milliseconds
 
@@ -142,9 +146,10 @@ public class MainActivity extends AppCompatActivity {
                 ed.putInt("melody", melodyIndex);
                 ed.putInt("timer", timer);
                 ed.commit();
-                playAudio(audioList.get(melodyIndex).getData());
+                playAudio(melodyIndex);
                 startTimer(timer);
                 animation.start();
+                */
             }
         });
 
@@ -152,9 +157,11 @@ public class MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                player.stopPlayer();
                 cancelTimer();
                 animation.cancel();
                 progressBar.clearAnimation();
+
             }
         });
 
@@ -165,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 melodyIndex--;
                 if (melodyIndex < 0) melodyIndex = 11;
                 textMelody.setText(data_melody[melodyIndex]);
+                start_lullababy();
             }
         });
 
@@ -175,10 +183,46 @@ public class MainActivity extends AppCompatActivity {
                 melodyIndex++;
                 if (melodyIndex > 11) melodyIndex = 0;
                 textMelody.setText(data_melody[melodyIndex]);
+                start_lullababy();
+
             }
         });
 
 
+    }
+
+    private void loadAudio() {
+        String [] melody;
+        Resources res = getResources();
+        melody = res.getStringArray(R.array.melody_array);
+        audioList = new ArrayList<>();
+
+        audioList.add(new Audio(R.raw.music0,  getString(R.string.app_name),  melody[0]));
+        audioList.add(new Audio(R.raw.music1,  getString(R.string.app_name),  melody[1]));
+        audioList.add(new Audio(R.raw.music2,  getString(R.string.app_name),  melody[2]));
+        audioList.add(new Audio(R.raw.music3,  getString(R.string.app_name),  melody[3]));
+        audioList.add(new Audio(R.raw.music4,  getString(R.string.app_name),  melody[4]));
+        audioList.add(new Audio(R.raw.music5,  getString(R.string.app_name),  melody[5]));
+        audioList.add(new Audio(R.raw.music6,  getString(R.string.app_name),  melody[6]));
+        audioList.add(new Audio(R.raw.music7,  getString(R.string.app_name),  melody[7]));
+        audioList.add(new Audio(R.raw.music8,  getString(R.string.app_name),  melody[8]));
+        audioList.add(new Audio(R.raw.music9,  getString(R.string.app_name),  melody[9]));
+        audioList.add(new Audio(R.raw.music10,  getString(R.string.app_name),  melody[10]));
+        audioList.add(new Audio(R.raw.music11,  getString(R.string.app_name),  melody[11]));
+    }
+
+    void start_lullababy(){
+        cancelTimer();
+        animation.setDuration(timer); //in milliseconds
+
+        sPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putInt("melody", melodyIndex);
+        ed.putInt("timer", timer);
+        ed.commit();
+        playAudio(melodyIndex);
+        startTimer(timer);
+        animation.start();
     }
 
     void startTimer(int time) {
@@ -253,27 +297,20 @@ public class MainActivity extends AppCompatActivity {
         //Check is service is active
         if (!serviceBound) {
             //Store Serializable audioList to SharedPreferences
-           // StorageUtil storage = new StorageUtil(getApplicationContext());
-            //storage.storeAudio(audioList);
-           // storage.storeAudioIndex(audioIndex);
-
-
-
+            StorageUtil storage = new StorageUtil(getApplicationContext());
+            storage.storeAudio(audioList);
+            storage.storeAudioIndex(audioIndex);
 
             Intent playerIntent = new Intent(this, MediaPlayerService.class);
             startService(playerIntent);
             bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         } else {
             //Store the new audioIndex to SharedPreferences
-           // StorageUtil storage = new StorageUtil(getApplicationContext());
-           // storage.storeAudioIndex(audioIndex);
+            StorageUtil storage = new StorageUtil(getApplicationContext());
+            storage.storeAudioIndex(audioIndex);
 
             //Service is active
             //Send a broadcast to the service -> PLAY_NEW_AUDIO
-            sPref = getPreferences(MODE_PRIVATE);
-            SharedPreferences.Editor ed = sPref.edit();
-            ed.putInt("audioIndex", audioIndex);
-            ed.commit();
             Intent broadcastIntent = new Intent(Broadcast_PLAY_NEW_AUDIO);
             sendBroadcast(broadcastIntent);
         }

@@ -26,7 +26,6 @@ public class Audio implements Serializable {
         this.data = data;
     }
 
-
     public String getAlbum() {
         return album;
     }
