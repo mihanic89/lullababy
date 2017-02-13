@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     cancelTimer();
                     animation.cancel();
                     progressBar.clearAnimation();
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
 
                     else{
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void start_lullababy(){
+        progressBar.setVisibility(View.VISIBLE);
         cancelTimer();
         animation.setDuration(timer); //in milliseconds
 
@@ -279,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
             player = binder.getService();
             serviceBound = true;
 
-            Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Service Bound", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -341,5 +343,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+
+    }
+
+    public void setBtnPlay(){
+        btnStart.setImageResource(android.R.drawable.ic_media_play);
+
+    }
+
+    public void setBtnPause(){
+        btnStart.setImageResource(android.R.drawable.ic_media_pause);
     }
 }

@@ -599,8 +599,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
         //Build a new notification according to the current state of the MediaPlayer
         if (playbackStatus == PlaybackStatus.PLAYING) {
+
             notificationAction = android.R.drawable.ic_media_pause;
-            //create the pause action
+                 //create the pause action
             play_pauseAction = playbackAction(1);
         } else if (playbackStatus == PlaybackStatus.PAUSED) {
             notificationAction = android.R.drawable.ic_media_play;
