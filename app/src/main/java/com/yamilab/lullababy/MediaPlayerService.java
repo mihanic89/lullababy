@@ -122,20 +122,22 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         }
 
         //Request audio focus
-        if (requestAudioFocus() == false) {
-            //Could not gain focus
-            stopSelf();
-        }
+        if (requestAudioFocus() == true) {
+            if (mediaSessionManager == null) {
+                try {
+                    initMediaSession();
+                    initMediaPlayer();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                    stopSelf();
+                }
+                buildNotification(PlaybackStatus.PLAYING);
+            }
 
-        if (mediaSessionManager == null) {
-            try {
-                initMediaSession();
-                initMediaPlayer();
-            } catch (RemoteException e) {
-                e.printStackTrace();
+            else{
+                //Could not gain focus
                 stopSelf();
             }
-            buildNotification(PlaybackStatus.PLAYING);
         }
 
         //Handle Intent action from MediaSession.TransportControls
@@ -200,6 +202,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         removeNotification();
         //stop the service
         stopSelf();
+        removeAudioFocus();
     }
 
     @Override
@@ -326,7 +329,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         //Reset so that the MediaPlayer is not pointing to another data source
         mediaPlayer.reset();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
+        mediaPlayer.setLooping(true);
         //
         // afd = context.getResources().openRawResourceFd(activeAudio.getData());
 
@@ -376,7 +379,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     private void playMedia() {
-        if (!mediaPlayer.isPlaying()) {
+        if (!mediaPlayer.isPlaying()&&requestAudioFocus()==true) {
             mediaPlayer.start();
         }
     }
@@ -386,6 +389,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }
+        removeAudioFocus();
     }
 
     private void pauseMedia() {
@@ -393,6 +397,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             mediaPlayer.pause();
             resumePosition = mediaPlayer.getCurrentPosition();
         }
+        removeAudioFocus();
     }
 
     private void resumeMedia() {
