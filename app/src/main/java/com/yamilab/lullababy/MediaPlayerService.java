@@ -213,6 +213,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         removeNotification();
         //stop the service
         stopSelf();
+        removeAudioFocus();
     }
 
     @Override
@@ -632,7 +633,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                 .setColor(getResources().getColor(R.color.colorAccent))
                 // Set the large and small icons
                 .setLargeIcon(largeIcon)
-                .setSmallIcon(android.R.drawable.stat_sys_headset)
+                .setSmallIcon(R.drawable.moon_icon)
                 // Set Notification content information
                 .setContentText(activeAudio.getArtist())
                 .setContentTitle(activeAudio.getAlbum())

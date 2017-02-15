@@ -3,6 +3,7 @@ package com.yamilab.lullababy;
 
 import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
+import android.app.DialogFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     String[] data_time;
     String[] data_melody;
+    String set_time;
     private ImageButton btnStart, btnStop, btnPrevious, btnNext;
 
     private TextView textMelody;
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int melodyIndex, defValue = 0;
 
-    private int timer;
+    private long timer;
 
     private SeekBar timerControl = null;
 
@@ -77,9 +80,20 @@ public class MainActivity extends AppCompatActivity {
 
 
         sPref = getPreferences(MODE_PRIVATE);
-        melodyIndex = sPref.getInt("melody", 0);
-        timer = sPref.getInt("timer", 300000);
 
+
+       // SharedPreferences.Editor ed = sPref.edit();
+       // ed.putInt("melody", melodyIndex);
+       // ed.putLong("timer", 15000);
+
+      //  ed.commit();
+
+        melodyIndex = sPref.getInt("melody", 0);
+        timer = sPref.getLong("timer", 200000);
+
+        //Toast.makeText(MainActivity.this,"seconds remaining: " + timer / 1000 + "melody " + melodyIndex,
+        //        Toast.LENGTH_SHORT).show();
+        set_time =sPref.getString("cheked_time",("00: " +"05"));
 
 
         textMelody = (TextView) findViewById(R.id.textViewMelody);
@@ -91,39 +105,13 @@ public class MainActivity extends AppCompatActivity {
 
         textMelody.setText(data_melody[melodyIndex]);
 
-        textTimer.setText(timer / 60000 + " мин.");
+       // textTimer.setText(timer / 60000 + " "+getString(R.string.activity_time));
+
+        textTimer.setText(set_time);
 
 
-        timerControl = (SeekBar) findViewById(R.id.timer_bar);
-        timerControl.setProgress(timer / 60000);
-
-        timerControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress < 5) {
-                    progress = 5;
-                    textTimer.setText(progress + " мин.");
-                } else textTimer.setText(progress + " мин.");
-                if (progress > 175) {
-                    progress = 600;
-                    textTimer.setText("∞ мин.");
-                } else textTimer.setText(progress + " мин.");
 
 
-                timer = progress * 60000;
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
 
 
         //анимация
@@ -134,11 +122,12 @@ public class MainActivity extends AppCompatActivity {
         //animation.start();
 
         btnStart = (ImageButton) findViewById(R.id.btnStart);
-       
+
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start_lullababy();
+                start_lullababy(melodyIndex,timer);
+
                 /*
                 cancelTimer();
                 animation.setDuration(timer); //in milliseconds
@@ -164,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 animation.cancel();
                 progressBar.clearAnimation();
                 progressBar.setVisibility(View.INVISIBLE);
+                cancelTimer();
             }
         });
 
@@ -193,6 +183,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void showTimePickerDialog(View v) {
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");
+    }
+
     private void loadAudio() {
         String [] melody;
         Resources res = getResources();
@@ -213,40 +208,48 @@ public class MainActivity extends AppCompatActivity {
         audioList.add(new Audio(R.raw.music11,  getString(R.string.app_name),  melody[11]));
     }
 
-    void start_lullababy(){
+    void start_lullababy(int  melodyIndex, long timer){
         progressBar.setVisibility(View.VISIBLE);
         cancelTimer();
-        animation.setDuration(timer); //in milliseconds
-
+        animation.cancel();
+        progressBar.clearAnimation();
         sPref = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putInt("melody", melodyIndex);
-        ed.putInt("timer", timer);
-        ed.commit();
+        melodyIndex = sPref.getInt("melody", 0);
+        timer = sPref.getLong("timer", 200000);
+        animation.setDuration(timer); //in milliseconds
         playAudio(melodyIndex);
         startTimer(timer);
+        Toast.makeText(MainActivity.this,"seconds remaining: " + timer / 1000,
+               Toast.LENGTH_SHORT).show();
         animation.start();
     }
 
-    void startTimer(int time) {
+    void startTimer(long time) {
+
+        Toast.makeText(MainActivity.this,"seconds remaining: " + time / 1000,
+               Toast.LENGTH_SHORT).show();
 
         cTimer = new CountDownTimer(time, 1000) {
+
+            //Toast.makeText(MainActivity.this,"seconds remaining: " + millisUntilFinished / 1000,
+            //       Toast.LENGTH_SHORT).show();
 
             @Override
             public void onTick(long millisUntilFinished) {
                 //textTimer.setText("seconds remaining: " + millisUntilFinished / 1000);
-                // Toast.makeText(MainActivity.this,"seconds remaining: " + millisUntilFinished / 1000,
-                //        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this,"seconds remaining: " + millisUntilFinished / 1000,
+                //       Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFinish() {
                 //  mTextField.setText("done!");
+                player.stopPlayer();
             }
 
         };
         cTimer.start();
-        animation.start();
+
     }
 
     void cancelTimer() {

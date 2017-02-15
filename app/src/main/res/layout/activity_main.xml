@@ -26,14 +26,8 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <SeekBar
-            android:id="@+id/timer_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="180"
-            android:progress="0"
-            android:progressDrawable="@drawable/progressbar"
-            android:secondaryProgress="0" />
+
+
 
         <TextView
             android:id="@+id/textViewTimer"
@@ -43,7 +37,10 @@
             android:padding="@dimen/activity_vertical_margin"
             android:text="@string/time"
             android:textColor="@android:color/white"
-            android:textSize="20sp" />
+            android:textSize="40sp"
+            android:onClick="showTimePickerDialog"/>
+
+
 
 
         <TextView
