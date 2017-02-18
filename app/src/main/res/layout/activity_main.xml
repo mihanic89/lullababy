@@ -27,6 +27,16 @@
         android:orientation="vertical">
 
 
+        <TextView
+            android:id="@+id/chooseTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="@dimen/activity_vertical_margin"
+            android:text="@string/time"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            />
 
 
         <TextView
@@ -35,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:padding="@dimen/activity_vertical_margin"
-            android:text="@string/time"
+            tools:text="12:12"
             android:textColor="@android:color/white"
             android:textSize="40sp"
             android:onClick="showTimePickerDialog"/>
@@ -49,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:padding="@dimen/activity_vertical_margin"
+            tools:text="Мелодия"
             android:textColor="@android:color/white"
             android:textSize="40sp" />
 
