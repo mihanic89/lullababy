@@ -22,7 +22,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start_lullababy(melodyIndex,timer);
+                start_lullababy(timer);
 
                 /*
                 cancelTimer();
@@ -164,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
                 melodyIndex--;
                 if (melodyIndex < 0) melodyIndex = 11;
                 textMelody.setText(data_melody[melodyIndex]);
+                sPref = getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor ed = sPref.edit();
+                ed.putInt("melody", melodyIndex);
+                ed.commit();
                // if( AudioManager.isMusicActive())start_lullababy();
             }
         });
@@ -175,6 +178,10 @@ public class MainActivity extends AppCompatActivity {
                 melodyIndex++;
                 if (melodyIndex > 11) melodyIndex = 0;
                 textMelody.setText(data_melody[melodyIndex]);
+                sPref = getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor ed = sPref.edit();
+                ed.putInt("melody", melodyIndex);
+                ed.commit();
               //  if(isMyServiceRunning(MediaPlayerService.class)==true)start_lullababy();
 
             }
@@ -208,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         audioList.add(new Audio(R.raw.music11,  getString(R.string.app_name),  melody[11]));
     }
 
-    void start_lullababy(int  melodyIndex, long timer){
+    void start_lullababy( long timer){
         progressBar.setVisibility(View.VISIBLE);
         cancelTimer();
         animation.cancel();
@@ -219,15 +226,15 @@ public class MainActivity extends AppCompatActivity {
         animation.setDuration(timer); //in milliseconds
         playAudio(melodyIndex);
         startTimer(timer);
-        Toast.makeText(MainActivity.this,"seconds remaining: " + timer / 1000,
-               Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity.this,"seconds remaining: " + timer / 1000,
+        //       Toast.LENGTH_SHORT).show();
         animation.start();
     }
 
     void startTimer(long time) {
 
-        Toast.makeText(MainActivity.this,"seconds remaining: " + time / 1000,
-               Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity.this,"seconds remaining: " + time / 1000,
+        //       Toast.LENGTH_SHORT).show();
 
         cTimer = new CountDownTimer(time, 1000) {
 
