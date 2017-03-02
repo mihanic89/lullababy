@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Toast.makeText(MainActivity.this,"seconds remaining: " + timer / 1000 + "melody " + melodyIndex,
         //        Toast.LENGTH_SHORT).show();
-        set_time =sPref.getString("cheked_time",("00: " +"05"));
+        set_time =sPref.getString("cheked_time",("00:" +"05"));
 
 
         textMelody = (TextView) findViewById(R.id.textViewMelody);

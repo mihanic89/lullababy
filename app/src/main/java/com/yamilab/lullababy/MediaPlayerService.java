@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.MediaSessionManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.media.MediaMetadataCompat;
@@ -27,6 +29,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import static com.yamilab.lullababy.PlaybackStatus.PLAYING;
 
 /**
  *
@@ -44,7 +48,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     public static final String ACTION_NEXT = "com.yamilab.lullababy.ACTION_NEXT";
     public static final String ACTION_STOP = "com.yamilab.lullababy.ACTION_STOP";
 
-
+    private  SharedPreferences sPref;
     private MediaPlayer mediaPlayer;
 
     //MediaSession
@@ -77,6 +81,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private AssetFileDescriptor afd;
     private InputStream ins;
 
+    private boolean isPlayed=false;
 
     /**
      * Service lifecycle methods
@@ -90,7 +95,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     public void onCreate() {
         super.onCreate();
         // Perform one-time setup procedures
-
+        isPlayed = true;
         // Manage incoming phone calls during playback.
         // Pause MediaPlayer on incoming call,
         // Resume on hangup.
@@ -111,7 +116,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             audioList = storage.loadAudio();
             audioIndex = storage.loadAudioIndex();
 
-            if (audioIndex != -1 && audioIndex < audioList.size()) {
+            if (audioIndex != -1 & audioIndex < audioList.size()) {
                 //index is in a valid range
                 activeAudio = audioList.get(audioIndex);
             } else {
@@ -122,7 +127,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         }
 
         //Request audio focus
-        if (requestAudioFocus() == true) {
+        if (requestAudioFocus()) {
             if (mediaSessionManager == null) {
                 try {
                     initMediaSession();
@@ -131,7 +136,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                     e.printStackTrace();
                     stopSelf();
                 }
-                buildNotification(PlaybackStatus.PLAYING);
+                buildNotification(PLAYING);
             }
 
             else{
@@ -261,8 +266,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             case AudioManager.AUDIOFOCUS_GAIN:
                 // resume playback
                 if (mediaPlayer == null) initMediaPlayer();
-                else if (!mediaPlayer.isPlaying()) mediaPlayer.start();
+                else if (!mediaPlayer.isPlaying()) resumeMedia();
                 mediaPlayer.setVolume(1.0f, 1.0f);
+                buildNotification ( PLAYING);
                 break;
              /*
                 if (mediaPlayer == null && !mediaPlayer.isPlaying()) mediaPlayer.start();// initMediaPlayer();
@@ -272,15 +278,16 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             */
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-                if (mediaPlayer.isPlaying()) mediaPlayer.stop();
-                mediaPlayer.release();
-                mediaPlayer = null;
+                if (mediaPlayer.isPlaying()){
+                    pauseMedia();
+                    buildNotification ( PlaybackStatus.PAUSED);}
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 // Lost focus for a short time, but we have to stop
                 // playback. We don't release the media player because playback
                 // is likely to resume
-                if (mediaPlayer.isPlaying()) mediaPlayer.pause();
+                if (mediaPlayer.isPlaying()) pauseMedia();
+                buildNotification ( PlaybackStatus.PAUSED);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 // Lost focus for a short time, but it's ok to keep playing
@@ -348,7 +355,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             e.printStackTrace();
         }
 
-       mediaPlayer.prepareAsync();
+        mediaPlayer.prepareAsync();
 
 
         /*
@@ -380,8 +387,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     private void playMedia() {
-        if (!mediaPlayer.isPlaying()&&requestAudioFocus()==true) {
+        if (!mediaPlayer.isPlaying()& requestAudioFocus()) {
             mediaPlayer.start();
+
         }
     }
 
@@ -389,12 +397,14 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         if (mediaPlayer == null) return;
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer=null;
         }
         removeAudioFocus();
     }
 
     private void pauseMedia() {
-        if (mediaPlayer.isPlaying()) {
+        if (mediaPlayer!=null & mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             resumePosition = mediaPlayer.getCurrentPosition();
         }
@@ -402,9 +412,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     private void resumeMedia() {
-        if (!mediaPlayer.isPlaying()) {
+        if (mediaPlayer!=null & !mediaPlayer.isPlaying() & requestAudioFocus()) {
             mediaPlayer.seekTo(resumePosition);
             mediaPlayer.start();
+
         }
     }
 
@@ -476,6 +487,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         //Starting listening for PhoneState changes
         phoneStateListener = new PhoneStateListener() {
+
             @Override
             public void onCallStateChanged(int state, String incomingNumber) {
                 switch (state) {
@@ -483,17 +495,23 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                     //pause the MediaPlayer
                     case TelephonyManager.CALL_STATE_OFFHOOK:
                     case TelephonyManager.CALL_STATE_RINGING:
-                        if (mediaPlayer != null) {
+                        if (mediaPlayer != null & mediaPlayer.isPlaying()) {
                             pauseMedia();
+                            buildNotification ( PlaybackStatus.PAUSED);
                             ongoingCall = true;
+                            isPlayed = true;
                         }
+                        else if (mediaPlayer == null | !mediaPlayer.isPlaying()) isPlayed = false;
+
+
                         break;
                     case TelephonyManager.CALL_STATE_IDLE:
                         // Phone idle. Start playing.
-                        if (mediaPlayer != null) {
+                        if (mediaPlayer != null & isPlayed) {
                             if (ongoingCall) {
                                 ongoingCall = false;
                                 resumeMedia();
+                                buildNotification ( PLAYING);
                             }
                         }
                         break;
@@ -512,7 +530,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private void initMediaSession() throws RemoteException {
         if (mediaSessionManager != null) return; //mediaSessionManager exists
 
-        mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        }
         // Create a new MediaSession
         mediaSession = new MediaSessionCompat(getApplicationContext(), "AudioPlayer");
         //Get MediaSessions transport controls
@@ -528,13 +548,14 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
         // Attach Callback to receive MediaSession updates
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
+
             // Implement callbacks
             @Override
             public void onPlay() {
                 super.onPlay();
 
                 resumeMedia();
-                buildNotification(PlaybackStatus.PLAYING);
+                buildNotification(PLAYING);
             }
 
             @Override
@@ -551,7 +572,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
                 skipToNext();
                 updateMetaData();
-                buildNotification(PlaybackStatus.PLAYING);
+                buildNotification(PLAYING);
             }
 
             @Override
@@ -560,7 +581,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
                 skipToPrevious();
                 updateMetaData();
-                buildNotification(PlaybackStatus.PLAYING);
+                buildNotification(PLAYING);
             }
 
             @Override
@@ -604,16 +625,17 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         PendingIntent play_pauseAction = null;
 
         //Build a new notification according to the current state of the MediaPlayer
-        if (playbackStatus == PlaybackStatus.PLAYING) {
+        if (playbackStatus == PLAYING) {
 
             notificationAction = android.R.drawable.ic_media_pause;
-                 //create the pause action
+            //create the pause action
             play_pauseAction = playbackAction(1);
         } else if (playbackStatus == PlaybackStatus.PAUSED) {
             notificationAction = android.R.drawable.ic_media_play;
             //create the play action
             play_pauseAction = playbackAction(0);
         }
+
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
                 R.drawable.image5); //replace with your own image
@@ -628,7 +650,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                         .setMediaSession(mediaSession.getSessionToken())
                         // Show our playback controls in the compat view
                         .setShowActionsInCompactView(0))
-                       // .setShowActionsInCompactView(0, 1, 2))
+                // .setShowActionsInCompactView(0, 1, 2))
                 // Set the Notification color
                 .setColor(getResources().getColor(R.color.colorAccent))
                 // Set the large and small icons
@@ -637,13 +659,15 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                 // Set Notification content information
                 .setContentText(activeAudio.getArtist())
                 .setContentTitle(activeAudio.getAlbum())
-               // .setContentInfo(activeAudio.getTitle())
+                // .setContentInfo(activeAudio.getTitle())
                 // Add playback actions
                 //.addAction(android.R.drawable.ic_media_previous, "previous", playbackAction(3))
                 .addAction(notificationAction, "pause", play_pauseAction);
-                //.addAction(android.R.drawable.ic_media_next, "next", playbackAction(2));
+        //.addAction(android.R.drawable.ic_media_next, "next", playbackAction(2));
 
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, notificationBuilder.build());
+
+
     }
 
 
@@ -683,8 +707,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         String actionString = playbackAction.getAction();
         if (actionString.equalsIgnoreCase(ACTION_PLAY)) {
             transportControls.play();
+
         } else if (actionString.equalsIgnoreCase(ACTION_PAUSE)) {
             transportControls.pause();
+
         } else if (actionString.equalsIgnoreCase(ACTION_NEXT)) {
             transportControls.skipToNext();
         } else if (actionString.equalsIgnoreCase(ACTION_PREVIOUS)) {
@@ -704,7 +730,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
             //Get the new media index form SharedPreferences
             audioIndex = new StorageUtil(getApplicationContext()).loadAudioIndex();
-            if (audioIndex != -1 && audioIndex < audioList.size()) {
+            if (audioIndex != -1 & audioIndex < audioList.size()) {
                 //index is in a valid range
                 activeAudio = audioList.get(audioIndex);
             } else {
@@ -714,10 +740,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             //A PLAY_NEW_AUDIO action received
             //reset mediaPlayer to play the new Audio
             stopMedia();
-            mediaPlayer.reset();
+            if (mediaPlayer!=null) mediaPlayer.reset();
             initMediaPlayer();
             updateMetaData();
-            buildNotification(PlaybackStatus.PLAYING);
+            buildNotification(PLAYING);
         }
     };
 
