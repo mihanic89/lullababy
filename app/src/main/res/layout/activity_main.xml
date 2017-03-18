@@ -34,6 +34,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="@dimen/activity_vertical_margin"
             android:text="@string/time"
+            tools:text="Выберите время"
             android:textColor="@android:color/white"
             android:textSize="25sp"
             />
@@ -89,9 +90,11 @@
                 android:id="@+id/btnPrevious"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:background="@drawable/circularbutton"
+
                 android:scaleType="centerCrop"
-                ads:srcCompat="@android:drawable/ic_media_previous" />
+                ads:srcCompat="@android:drawable/ic_media_previous"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/btnStart"
@@ -99,10 +102,10 @@
                 ads:srcCompat="@android:drawable/ic_media_play"
                 android:layout_height="72dp"
                 android:layout_toEndOf="@+id/btnPrevious"
-                android:background="@drawable/circularbutton"
+
                 android:scaleType="centerCrop"
                 android:clickable="true"
-                style="@style/Widget.AppCompat.Button.Colored"
+                android:background="?attr/selectableItemBackgroundBorderless"
                  />
             <ImageButton
                 android:id="@+id/btnStop"
@@ -110,9 +113,10 @@
                 ads:srcCompat="@android:drawable/ic_media_pause"
                 android:layout_height="72dp"
                 android:layout_toEndOf="@+id/btnStart"
-                android:background="@drawable/circularbutton"
+
                 android:scaleType="centerCrop"
                 android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 />
 
 
@@ -121,9 +125,11 @@
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:layout_toEndOf="@+id/btnStop"
-                android:background="@drawable/circularbutton"
+
                 android:scaleType="centerCrop"
-                ads:srcCompat="@android:drawable/ic_media_next" />
+                ads:srcCompat="@android:drawable/ic_media_next"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
 
         </RelativeLayout>

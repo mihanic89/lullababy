@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         textMelody = (TextView) findViewById(R.id.textViewMelody);
         textTimer = (TextView) findViewById(R.id.textViewTimer);
-        
+
         data_melody =
                 getResources().getStringArray(R.array.melody_array);
 

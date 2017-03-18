@@ -601,7 +601,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
     private void updateMetaData() {
         Bitmap albumArt = BitmapFactory.decodeResource(getResources(),
-                R.drawable.image5); //replace with medias albumArt
+                R.mipmap.ic_launcher); //replace with medias albumArt
         // Update the current metadata
         mediaSession.setMetadata(new MediaMetadataCompat.Builder()
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArt)
@@ -638,24 +638,29 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
 
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
-                R.drawable.image5); //replace with your own image
+                R.mipmap.ic_launcher); //replace with your own image
+
 
         // Create a new Notification
         NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                 // Hide the timestamp
+                .setOngoing(true)
                 .setShowWhen(false)
                 // Set the Notification style
                 .setStyle(new NotificationCompat.MediaStyle()
                         // Attach our MediaSession token
                         .setMediaSession(mediaSession.getSessionToken())
                         // Show our playback controls in the compat view
-                        .setShowActionsInCompactView(0))
+                        .setShowActionsInCompactView(0)
+                        .setShowCancelButton(true)
+                )
                 // .setShowActionsInCompactView(0, 1, 2))
                 // Set the Notification color
+
                 .setColor(getResources().getColor(R.color.colorAccent))
                 // Set the large and small icons
                 .setLargeIcon(largeIcon)
-                .setSmallIcon(R.drawable.moon_icon)
+                .setSmallIcon(R.drawable.ic_moon)
                 // Set Notification content information
                 .setContentText(activeAudio.getArtist())
                 .setContentTitle(activeAudio.getAlbum())
@@ -664,6 +669,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                 //.addAction(android.R.drawable.ic_media_previous, "previous", playbackAction(3))
                 .addAction(notificationAction, "pause", play_pauseAction);
         //.addAction(android.R.drawable.ic_media_next, "next", playbackAction(2));
+
 
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, notificationBuilder.build());
 
