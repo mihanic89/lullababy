@@ -99,7 +99,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         // Manage incoming phone calls during playback.
         // Pause MediaPlayer on incoming call,
         // Resume on hangup.
-        callStateListener();
+        //callStateListener();
         //ACTION_AUDIO_BECOMING_NOISY -- change in audio outputs -- BroadcastReceiver
         registerBecomingNoisyReceiver();
         //Listen for new Audio to play -- BroadcastReceiver
